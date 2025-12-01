@@ -102,6 +102,15 @@ Content-Type: application/json
     "stockAmount": 20
 }
 
+### 9b. Incrementar stock usando endpoint dedicado (REQUIERE autenticación)
+PATCH {{BaseUrl}}/api/v1/productos/{{productoId}}/stock
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "incremento": 5
+}
+
 ### 10. Intentar eliminar producto SIN autenticación (debe fallar con 401/403)
 DELETE {{BaseUrl}}/api/v1/productos/{{productoId}}
 

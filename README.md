@@ -218,6 +218,7 @@ tp2/
 - `GET /api/v1/productos/:id` - Obtener producto por ID
 - `POST /api/v1/productos` - Crear producto (público)
 - `PUT /api/v1/productos/:id` - Actualizar producto (requiere JWT)
+- `PATCH /api/v1/productos/:id/stock` - Incrementar stock (requiere JWT, incremento mínimo 1)
 - `DELETE /api/v1/productos/:id` - Eliminar producto (requiere JWT)
 
 ### Usuarios
@@ -232,6 +233,25 @@ tp2/
 ### Documentación
 - `GET /api-docs` - Documentación interactiva de la API (Scalar)
 - `GET /openapi.json` - Especificación OpenAPI en formato JSON
+
+---
+
+## 📦 Endpoint dedicado para incrementar stock
+
+- **Ruta:** `PATCH /api/v1/productos/:id/stock`
+- **Autenticación:** `Authorization: Bearer <token>`
+- **Body requerido:**
+```json
+{
+  "incremento": 5
+}
+```
+- **Reglas de negocio:**
+  - `incremento` debe ser un entero mayor o igual a 1.
+  - El ID debe existir y respetar el formato según el proveedor (ObjectId en MongoDB, string en JSON).
+  - El nuevo stock se calcula sumando el incremento al stock actual, sin permitir decrementos.
+
+Este endpoint está pensado para los casos donde solo necesites ajustar el stock sin modificar otros campos del producto, cumpliendo con el requerimiento de incremento mínimo.
 
 ---
 

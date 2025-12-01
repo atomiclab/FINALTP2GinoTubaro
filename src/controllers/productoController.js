@@ -70,6 +70,28 @@ export const ProductoController = {
                 error: error.message
             });
         }
+    },
+
+    incrementarStock: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { incremento } = req.body;
+
+            const productoActualizado = await ProductoService.incrementarStock(id, incremento);
+            res.status(200).json(productoActualizado);
+        } catch (error) {
+            let statusCode = 400;
+            if (error.message === 'Producto no encontrado') {
+                statusCode = 404;
+            } else if (error.message === 'ID de producto inválido') {
+                statusCode = 400;
+            }
+
+            res.status(statusCode).json({
+                statusCode,
+                error: error.message
+            });
+        }
     }
 };
 

@@ -91,6 +91,18 @@ export const openApiSpec = {
           },
         },
       },
+      ProductoStockIncrement: {
+        type: 'object',
+        properties: {
+          incremento: {
+            type: 'integer',
+            description: 'Cantidad a incrementar en el stock (mínimo 1)',
+            minimum: 1,
+            example: 5,
+          },
+        },
+        required: ['incremento'],
+      },
       Usuario: {
         type: 'object',
         properties: {
@@ -473,6 +485,82 @@ export const openApiSpec = {
           },
           '400': {
             description: 'ID de producto inválido',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse',
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'No autorizado - Token JWT requerido',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse',
+                },
+              },
+            },
+          },
+          '404': {
+            description: 'Producto no encontrado',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ErrorResponse',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/api/v1/productos/{id}/stock': {
+      patch: {
+        tags: ['Productos'],
+        summary: 'Incrementar stock de un producto',
+        description: 'Incrementa el stock del producto en la cantidad indicada. Requiere autenticación JWT. El incremento mínimo es 1.',
+        security: [
+          {
+            bearerAuth: [],
+          },
+        ],
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID del producto (MongoDB ObjectId)',
+            schema: {
+              type: 'string',
+            },
+            example: '692e218a586b408ab6a82008',
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                $ref: '#/components/schemas/ProductoStockIncrement',
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Stock incrementado exitosamente',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/Producto',
+                },
+              },
+            },
+          },
+          '400': {
+            description: 'Error de validación o ID inválido',
             content: {
               'application/json': {
                 schema: {

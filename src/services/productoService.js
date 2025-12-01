@@ -150,6 +150,34 @@ export const ProductoService = {
 
         await ProductoRepositorySelected.delete(id);
         return { message: 'Producto eliminado correctamente' };
+    },
+
+    incrementarStock: async (id, incremento) => {
+        if (!id) {
+            throw new Error('El ID es obligatorio');
+        }
+
+        if (config.DB_PROVIDER === 'mongo' && !mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error('ID de producto inválido');
+        }
+
+        const incrementoNumero = Number(incremento);
+        if (!Number.isInteger(incrementoNumero) || incrementoNumero < 1) {
+            throw new Error('El incremento de stock debe ser un entero mayor o igual a 1');
+        }
+
+        const productoExistente = await ProductoRepositorySelected.getById(id);
+        if (!productoExistente) {
+            throw new Error('Producto no encontrado');
+        }
+
+        const nuevoStock = (productoExistente.stockAmount || 0) + incrementoNumero;
+
+        const productoActualizado = await ProductoRepositorySelected.update(id, {
+            stockAmount: nuevoStock
+        });
+
+        return productoActualizado;
     }
 };
 
