@@ -1,0 +1,114 @@
+@Host=http://127.0.0.1
+@Port=3000
+@BaseUrl={{Host}}:{{Port}}
+
+### Variables para pruebas YA CARGADAS CON MI USUARIO
+@userId=692e11f4a235f436ee7b9609
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTJlMTFmNGEyMzVmNDM2ZWU3Yjk2MDkiLCJtYWlsIjoiZ2lub0B0ZXN0LmNvbSIsImlhdCI6MTc2NDYyNjk5NiwiZXhwIjoxNzY0NzEzMzk2fQ.aEMl5L9Lx9Y1tHOleKTWR8i5A6cfYLe80VlHwCVAnLU
+
+### 1. Crear un nuevo usuario
+POST {{BaseUrl}}/api/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Gino",
+    "apellido": "Tubaro",
+    "mail": "gino@test.com",
+    "contrasena": "123456",
+    "edad": 28
+}
+
+### 2. Listar todos los usuarios
+GET {{BaseUrl}}/api/usuarios
+
+### 3. Obtener un usuario por ID
+# Reemplazar {{userId}} con un ID válido después de crear un usuario
+GET {{BaseUrl}}/api/usuarios/{{userId}}
+
+### 4. Login - Obtener token JWT
+POST {{BaseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "mail": "gino@test.com",
+    "contrasena": "123456"
+}
+
+### 5. Incrementar edad (usando token del usuario autenticado)
+# Reemplazar {{token}} con el token obtenido del login
+PATCH {{BaseUrl}}/api/editaredad
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### 6. Incrementar edad (especificando userId en el body)
+# Reemplazar {{token}} con el token obtenido del login
+# Reemplazar {{userId}} con un ID válido
+PATCH {{BaseUrl}}/api/editaredad
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "userId": "{{userId}}"
+}
+
+### 7. Intentar incrementar edad sin token (debe fallar con 401)
+PATCH {{BaseUrl}}/api/editaredad
+Content-Type: application/json
+
+{}
+
+### 8. Crear otro usuario para pruebas
+POST {{BaseUrl}}/api/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "mail": "juan@test.com",
+    "contrasena": "password123",
+    "edad": 25
+}
+
+### 9. Login con credenciales incorrectas (debe fallar)
+POST {{BaseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "mail": "gino@test.com",
+    "contrasena": "passwordIncorrecta"
+}
+
+### 10. Crear usuario con email duplicado (debe fallar)
+POST {{BaseUrl}}/api/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Otro",
+    "apellido": "Usuario",
+    "mail": "gino@test.com",
+    "contrasena": "123456",
+    "edad": 30
+}
+
+### 11. Crear usuario sin campos obligatorios (debe fallar)
+POST {{BaseUrl}}/api/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Test"
+}
+
+### 12. Crear usuario con edad negativa (debe fallar)
+POST {{BaseUrl}}/api/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Test",
+    "apellido": "Usuario",
+    "mail": "test@test.com",
+    "contrasena": "123456",
+    "edad": -1
+}
+
