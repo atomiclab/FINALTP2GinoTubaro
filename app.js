@@ -12,7 +12,7 @@ const runServer = async () => {
             config.PORT,
             config.HOST,
             console.log(`
-                Server is running at: http://${config.HOST}:${config.PORT}
+                El server esta andando en: http://${config.HOST}:${config.PORT} y en /api-docs esta la documentacion de la API.
             `)
         );
     } catch (error) {
