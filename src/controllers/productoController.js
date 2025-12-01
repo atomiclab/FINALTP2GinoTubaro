@@ -31,8 +31,9 @@ export const ProductoController = {
             const producto = await ProductoUseCases.obtenerProductoPorId(id);
             res.status(200).json(producto);
         } catch (error) {
-            res.status(404).json({
-                statusCode: 404,
+            const statusCode = error.message === 'ID de producto inválido' ? 400 : 404;
+            res.status(statusCode).json({
+                statusCode,
                 error: error.message
             });
         }
@@ -44,7 +45,12 @@ export const ProductoController = {
             const producto = await ProductoUseCases.actualizarProducto(id, req.body);
             res.status(200).json(producto);
         } catch (error) {
-            const statusCode = error.message === 'Producto no encontrado' ? 404 : 400;
+            let statusCode = 400;
+            if (error.message === 'Producto no encontrado') {
+                statusCode = 404;
+            } else if (error.message === 'ID de producto inválido') {
+                statusCode = 400;
+            }
             res.status(statusCode).json({
                 statusCode,
                 error: error.message
@@ -58,8 +64,9 @@ export const ProductoController = {
             await ProductoUseCases.eliminarProducto(id);
             res.status(200).json({ message: 'Producto eliminado correctamente' });
         } catch (error) {
-            res.status(404).json({
-                statusCode: 404,
+            const statusCode = error.message === 'ID de producto inválido' ? 400 : 404;
+            res.status(statusCode).json({
+                statusCode,
                 error: error.message
             });
         }
