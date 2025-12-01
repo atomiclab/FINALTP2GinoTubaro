@@ -24,7 +24,6 @@ API RESTful desarrollada con Node.js y Express que implementa un sistema de gest
 1. Clonar el repositorio:
 ```bash
 git clone <url-del-repositorio>
-cd tp2
 ```
 
 2. Instalar dependencias:
