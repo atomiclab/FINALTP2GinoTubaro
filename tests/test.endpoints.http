@@ -2,11 +2,26 @@
 @Port=3000
 @BaseUrl={{Host}}:{{Port}}
 
-### Variables para pruebas YA CARGADAS CON MI USUARIO
-@userId=692e11f4a235f436ee7b9609
-@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTJlMTFmNGEyMzVmNDM2ZWU3Yjk2MDkiLCJtYWlsIjoiZ2lub0B0ZXN0LmNvbSIsImlhdCI6MTc2NDYyNjk5NiwiZXhwIjoxNzY0NzEzMzk2fQ.aEMl5L9Lx9Y1tHOleKTWR8i5A6cfYLe80VlHwCVAnLU
+### ============================================
+### INSTRUCCIONES PARA OBTENER TOKEN JWT
+### ============================================
+### 1. Primero necesitas crear un usuario (si no existe) usando el endpoint de autenticación
+### 2. Luego hacer login para obtener el token JWT:
+###    POST {{BaseUrl}}/api/auth/login
+###    Body: { "mail": "tu@email.com", "contrasena": "tuPassword" }
+### 3. Copiar el token de la respuesta y reemplazar {{token}} en las peticiones protegidas
+### ============================================
 
-### 1. Crear un nuevo usuario
+### Variables para pruebas
+### Reemplazar estos valores con datos reales después de crear un usuario y hacer login
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTJlMTFmNGEyMzVmNDM2ZWU3Yjk2MDkiLCJtYWlsIjoiZ2lub0B0ZXN0LmNvbSIsImlhdCI6MTc2NDYyOTk3NywiZXhwIjoxNzY0NzE2Mzc3fQ.hoyWQ1LuaTY8sDtjUQ15qexEbEspb1JMyVwwq3v9FIk
+@productoId=692e1d409b09f2c0f9c0c762
+
+### ============================================
+### AUTENTICACIÓN
+### ============================================
+
+### 1. Crear usuario (necesario para obtener token)
 POST {{BaseUrl}}/api/usuarios
 Content-Type: application/json
 
@@ -18,14 +33,8 @@ Content-Type: application/json
     "edad": 28
 }
 
-### 2. Listar todos los usuarios
-GET {{BaseUrl}}/api/usuarios
-
-### 3. Obtener un usuario por ID
-# Reemplazar {{userId}} con un ID válido después de crear un usuario
-GET {{BaseUrl}}/api/usuarios/{{userId}}
-
-### 4. Login - Obtener token JWT
+### 2. Login - Obtener token JWT
+### Usar las credenciales del usuario creado en el paso anterior
 POST {{BaseUrl}}/api/auth/login
 Content-Type: application/json
 
@@ -34,81 +43,120 @@ Content-Type: application/json
     "contrasena": "123456"
 }
 
-### 5. Incrementar edad (usando token del usuario autenticado)
-# Reemplazar {{token}} con el token obtenido del login
-PATCH {{BaseUrl}}/api/editaredad
+### ============================================
+### PRODUCTOS - CRUD
+### ============================================
+
+### 3. Crear un nuevo producto (NO requiere autenticación)
+POST {{BaseUrl}}/api/v1/productos
+Content-Type: application/json
+
+{
+    "producto": "Laptop Dell XPS 15",
+    "stockAmount": 10
+}
+
+### 4. Crear producto con fechaIngreso personalizada
+POST {{BaseUrl}}/api/v1/productos
+Content-Type: application/json
+
+{
+    "producto": "Impresora 3D BambuLab A1",
+    "stockAmount": 25,
+    "fechaIngreso": "2025-01-15"
+}
+
+### 5. Listar todos los productos (NO requiere autenticación)
+GET {{BaseUrl}}/api/v1/productos
+
+### 6. Obtener un producto por ID (NO requiere autenticación)
+### Reemplazar {{productoId}} con un ID válido después de crear un producto
+GET {{BaseUrl}}/api/v1/productos/{{productoId}}
+
+### 7. Intentar actualizar producto SIN autenticación (debe fallar con 401/403)
+PUT {{BaseUrl}}/api/v1/productos/{{productoId}}
+Content-Type: application/json
+
+{
+    "producto": "Laptop Dell XPS 15 Actualizada",
+    "stockAmount": 15
+}
+
+### 8. Actualizar producto CON JWT Token válido (REQUIERE autenticación)
+### Reemplazar {{token}} con el token obtenido del login
+PUT {{BaseUrl}}/api/v1/productos/{{productoId}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
-{}
+{
+    "producto": "Laptop Dell XPS 15 Actualizada",
+    "stockAmount": 15
+}
 
-### 6. Incrementar edad (especificando userId en el body)
-# Reemplazar {{token}} con el token obtenido del login
-# Reemplazar {{userId}} con un ID válido
-PATCH {{BaseUrl}}/api/editaredad
+### 9. Actualizar solo el stock (incremento mínimo 1)
+PUT {{BaseUrl}}/api/v1/productos/{{productoId}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "userId": "{{userId}}"
+    "stockAmount": 20
 }
 
-### 7. Intentar incrementar edad sin token (debe fallar con 401)
-PATCH {{BaseUrl}}/api/editaredad
-Content-Type: application/json
+### 10. Intentar eliminar producto SIN autenticación (debe fallar con 401/403)
+DELETE {{BaseUrl}}/api/v1/productos/{{productoId}}
 
-{}
+### 11. Eliminar producto CON JWT Token válido (REQUIERE autenticación)
+### Reemplazar {{token}} con el token obtenido del login
+DELETE {{BaseUrl}}/api/v1/productos/{{productoId}}
+Authorization: Bearer {{token}}
 
-### 8. Crear otro usuario para pruebas
-POST {{BaseUrl}}/api/usuarios
-Content-Type: application/json
+### ============================================
+### VALIDACIONES Y ERRORES
+### ============================================
 
-{
-    "nombre": "Juan",
-    "apellido": "Pérez",
-    "mail": "juan@test.com",
-    "contrasena": "password123",
-    "edad": 25
-}
-
-### 9. Login con credenciales incorrectas (debe fallar)
-POST {{BaseUrl}}/api/auth/login
+### 12. Crear producto sin campo producto (debe fallar)
+POST {{BaseUrl}}/api/v1/productos
 Content-Type: application/json
 
 {
-    "mail": "gino@test.com",
-    "contrasena": "passwordIncorrecta"
+    "stockAmount": 10
 }
 
-### 10. Crear usuario con email duplicado (debe fallar)
-POST {{BaseUrl}}/api/usuarios
+### 13. Crear producto con stockAmount negativo (debe fallar)
+POST {{BaseUrl}}/api/v1/productos
 Content-Type: application/json
 
 {
-    "nombre": "Otro",
-    "apellido": "Usuario",
-    "mail": "gino@test.com",
-    "contrasena": "123456",
-    "edad": 30
+    "producto": "Producto Test",
+    "stockAmount": -5
 }
 
-### 11. Crear usuario sin campos obligatorios (debe fallar)
-POST {{BaseUrl}}/api/usuarios
+### 14. Crear producto con stockAmount no entero (debe fallar)
+POST {{BaseUrl}}/api/v1/productos
 Content-Type: application/json
 
 {
-    "nombre": "Test"
+    "producto": "Producto Test",
+    "stockAmount": 10.5
 }
 
-### 12. Crear usuario con edad negativa (debe fallar)
-POST {{BaseUrl}}/api/usuarios
+### 15. Actualizar con incremento de stock menor a 1 (debe fallar)
+PUT {{BaseUrl}}/api/v1/productos/{{productoId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "nombre": "Test",
-    "apellido": "Usuario",
-    "mail": "test@test.com",
-    "contrasena": "123456",
-    "edad": -1
+    "stockAmount": 0
 }
 
+### 16. Obtener producto con ID inválido (debe retornar 404)
+GET {{BaseUrl}}/api/v1/productos/507f1f77bcf86cd799439011
+
+### ============================================
+### ALBUMS CSV
+### ============================================
+
+### 17. Obtener albums en formato CSV (NO requiere autenticación)
+### Este endpoint consume la API externa, toma los primeros 15 registros,
+### los convierte a CSV, los guarda en database/albums_15.csv y devuelve el CSV
+GET {{BaseUrl}}/api/v1/albums/csv
