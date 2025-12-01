@@ -24,7 +24,7 @@ const validateEdad = (edad) => {
     return { valid: true };
 };
 
-export const UsuarioUseCases = {
+export const UsuarioService = {
     crearUsuario: async (usuarioData) => {
         const { nombre, apellido, mail, contrasena, edad } = usuarioData;
 

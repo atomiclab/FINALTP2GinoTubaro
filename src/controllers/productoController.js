@@ -1,9 +1,9 @@
-import { ProductoUseCases } from '../use-cases/productoUseCases.js';
+import { ProductoService } from '../services/productoService.js';
 
 export const ProductoController = {
     crearProducto: async (req, res) => {
         try {
-            const producto = await ProductoUseCases.crearProducto(req.body);
+            const producto = await ProductoService.crearProducto(req.body);
             res.status(201).json(producto);
         } catch (error) {
             res.status(400).json({
@@ -15,7 +15,7 @@ export const ProductoController = {
 
     listarProductos: async (req, res) => {
         try {
-            const productos = await ProductoUseCases.listarProductos();
+            const productos = await ProductoService.listarProductos();
             res.status(200).json(productos);
         } catch (error) {
             res.status(500).json({
@@ -28,7 +28,7 @@ export const ProductoController = {
     obtenerProductoPorId: async (req, res) => {
         try {
             const { id } = req.params;
-            const producto = await ProductoUseCases.obtenerProductoPorId(id);
+            const producto = await ProductoService.obtenerProductoPorId(id);
             res.status(200).json(producto);
         } catch (error) {
             const statusCode = error.message === 'ID de producto inválido' ? 400 : 404;
@@ -42,7 +42,7 @@ export const ProductoController = {
     actualizarProducto: async (req, res) => {
         try {
             const { id } = req.params;
-            const producto = await ProductoUseCases.actualizarProducto(id, req.body);
+            const producto = await ProductoService.actualizarProducto(id, req.body);
             res.status(200).json(producto);
         } catch (error) {
             let statusCode = 400;
@@ -61,7 +61,7 @@ export const ProductoController = {
     eliminarProducto: async (req, res) => {
         try {
             const { id } = req.params;
-            await ProductoUseCases.eliminarProducto(id);
+            await ProductoService.eliminarProducto(id);
             res.status(200).json({ message: 'Producto eliminado correctamente' });
         } catch (error) {
             const statusCode = error.message === 'ID de producto inválido' ? 400 : 404;

@@ -1,9 +1,9 @@
-import { UsuarioUseCases } from '../use-cases/usuarioUseCases.js';
+import { UsuarioService } from '../services/usuarioService.js';
 
 export const UsuarioController = {
     crearUsuario: async (req, res) => {
         try {
-            const usuario = await UsuarioUseCases.crearUsuario(req.body);
+            const usuario = await UsuarioService.crearUsuario(req.body);
             res.status(201).json(usuario);
         } catch (error) {
             res.status(400).json({
@@ -15,7 +15,7 @@ export const UsuarioController = {
 
     listarUsuarios: async (req, res) => {
         try {
-            const usuarios = await UsuarioUseCases.listarUsuarios();
+            const usuarios = await UsuarioService.listarUsuarios();
             res.json(usuarios);
         } catch (error) {
             res.status(500).json({
@@ -28,7 +28,7 @@ export const UsuarioController = {
     obtenerUsuarioPorId: async (req, res) => {
         try {
             const { id } = req.params;
-            const usuario = await UsuarioUseCases.obtenerUsuarioPorId(id);
+            const usuario = await UsuarioService.obtenerUsuarioPorId(id);
             res.json(usuario);
         } catch (error) {
             res.status(404).json({
@@ -50,7 +50,7 @@ export const UsuarioController = {
                 });
             }
 
-            const usuario = await UsuarioUseCases.incrementarEdad(userId);
+            const usuario = await UsuarioService.incrementarEdad(userId);
             res.json(usuario);
         } catch (error) {
             res.status(404).json({

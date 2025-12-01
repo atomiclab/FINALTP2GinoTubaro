@@ -1,4 +1,4 @@
-import { UsuarioUseCases } from '../use-cases/usuarioUseCases.js';
+import { UsuarioService } from '../services/usuarioService.js';
 import { generateToken } from '../auth/generateToken.js';
 
 export const AuthController = {
@@ -6,7 +6,7 @@ export const AuthController = {
         try {
             const { mail, contrasena } = req.body;
 
-            const usuario = await UsuarioUseCases.login(mail, contrasena);
+            const usuario = await UsuarioService.login(mail, contrasena);
 
             const token = generateToken(usuario._id.toString(), usuario.mail);
 

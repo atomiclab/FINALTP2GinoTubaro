@@ -1,19 +1,18 @@
 import express from 'express';
-import usuarioRouter from './routes/usuarioRoutes.js';
+import productoRouter from './routes/productoRoutes.js';
+import albumsRouter from './routes/albumsRoutes.js';
 import authRouter from './routes/authRoutes.js';
-import { authMiddleware } from './middlewares/authMiddleware.js';
-import { UsuarioController } from './controllers/usuarioController.js';
+import usuarioRouter from './routes/usuarioRoutes.js';
 
 const server = express();
 
 server.use(express.json());
 
-// Rutas públicas (sin autenticación)
-server.use('/api/usuarios', usuarioRouter);
+// Rutas públicas
+server.use('/api/v1/productos', productoRouter);
+server.use('/api/v1/albums', albumsRouter);
 server.use('/api/auth', authRouter);
-
-// Ruta protegida (requiere autenticación JWT)
-server.patch('/api/editaredad', authMiddleware, UsuarioController.incrementarEdad);
+server.use('/api/usuarios', usuarioRouter);
 
 // Manejo de rutas no encontradas
 server.use((req, res) => {
