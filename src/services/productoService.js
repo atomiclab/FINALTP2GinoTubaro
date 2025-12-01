@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { ProductoRepository } from '../repository/producto.repository.js';
+import { config } from '../config/config.js';
+import { ProductoRepositorySelected } from '../repository/producto.repository.factory.js';
 
 const validateRequired = (value, fieldName) => {
     if (!value || (typeof value === 'string' && value.trim() === '')) {
@@ -52,12 +53,12 @@ export const ProductoService = {
             datosProducto.fechaIngreso = new Date(fechaIngreso);
         }
 
-        const nuevoProducto = await ProductoRepository.create(datosProducto);
+        const nuevoProducto = await ProductoRepositorySelected.create(datosProducto);
         return nuevoProducto;
     },
 
     listarProductos: async () => {
-        return await ProductoRepository.getAll();
+        return await ProductoRepositorySelected.getAll();
     },
 
     obtenerProductoPorId: async (id) => {
@@ -65,12 +66,12 @@ export const ProductoService = {
             throw new Error('El ID es obligatorio');
         }
 
-        // Validar que el ID sea un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(id)) {
+        // Validar que el ID sea un ObjectId válido solo si se usa MongoDB
+        if (config.DB_PROVIDER === 'mongo' && !mongoose.Types.ObjectId.isValid(id)) {
             throw new Error('ID de producto inválido');
         }
 
-        const producto = await ProductoRepository.getById(id);
+        const producto = await ProductoRepositorySelected.getById(id);
         if (!producto) {
             throw new Error('Producto no encontrado');
         }
@@ -83,13 +84,13 @@ export const ProductoService = {
             throw new Error('El ID es obligatorio');
         }
 
-        // Validar que el ID sea un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(id)) {
+        // Validar que el ID sea un ObjectId válido solo si se usa MongoDB
+        if (config.DB_PROVIDER === 'mongo' && !mongoose.Types.ObjectId.isValid(id)) {
             throw new Error('ID de producto inválido');
         }
 
         // Verificar que el producto existe
-        const productoExistente = await ProductoRepository.getById(id);
+        const productoExistente = await ProductoRepositorySelected.getById(id);
         if (!productoExistente) {
             throw new Error('Producto no encontrado');
         }
@@ -128,7 +129,7 @@ export const ProductoService = {
             updateData.fechaIngreso = new Date(updateData.fechaIngreso);
         }
 
-        const productoActualizado = await ProductoRepository.update(id, updateData);
+        const productoActualizado = await ProductoRepositorySelected.update(id, updateData);
         return productoActualizado;
     },
 
@@ -137,17 +138,17 @@ export const ProductoService = {
             throw new Error('El ID es obligatorio');
         }
 
-        // Validar que el ID sea un ObjectId válido
-        if (!mongoose.Types.ObjectId.isValid(id)) {
+        // Validar que el ID sea un ObjectId válido solo si se usa MongoDB
+        if (config.DB_PROVIDER === 'mongo' && !mongoose.Types.ObjectId.isValid(id)) {
             throw new Error('ID de producto inválido');
         }
 
-        const producto = await ProductoRepository.getById(id);
+        const producto = await ProductoRepositorySelected.getById(id);
         if (!producto) {
             throw new Error('Producto no encontrado');
         }
 
-        await ProductoRepository.delete(id);
+        await ProductoRepositorySelected.delete(id);
         return { message: 'Producto eliminado correctamente' };
     }
 };

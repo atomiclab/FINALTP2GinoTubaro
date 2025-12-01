@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { UsuarioRepository } from '../repository/usuario.repository.js';
+import { UsuarioRepositorySelected } from '../repository/usuario.repository.factory.js';
 
 const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -59,7 +59,7 @@ export const UsuarioService = {
         }
 
         // Verificar si el mail ya existe
-        const usuarioExistente = await UsuarioRepository.getByMail(mail);
+        const usuarioExistente = await UsuarioRepositorySelected.getByMail(mail);
         if (usuarioExistente) {
             throw new Error('El mail ya está registrado');
         }
@@ -69,7 +69,7 @@ export const UsuarioService = {
         const hashedPassword = await bcrypt.hash(contrasena, saltRounds);
 
         // Crear usuario
-        const nuevoUsuario = await UsuarioRepository.create({
+        const nuevoUsuario = await UsuarioRepositorySelected.create({
             nombre: nombre.trim(),
             apellido: apellido.trim(),
             mail: mail.toLowerCase().trim(),
@@ -77,14 +77,16 @@ export const UsuarioService = {
             edad: Number(edad)
         });
 
-        // Retornar sin contraseña
-        const usuarioSinPassword = nuevoUsuario.toObject();
+        // Retornar sin contraseña (compatible con MongoDB y JSON)
+        const usuarioSinPassword = typeof nuevoUsuario.toObject === 'function' 
+            ? nuevoUsuario.toObject() 
+            : { ...nuevoUsuario };
         delete usuarioSinPassword.contrasena;
         return usuarioSinPassword;
     },
 
     listarUsuarios: async () => {
-        return await UsuarioRepository.getAll();
+        return await UsuarioRepositorySelected.getAll();
     },
 
     obtenerUsuarioPorId: async (id) => {
@@ -92,7 +94,7 @@ export const UsuarioService = {
             throw new Error('El ID es obligatorio');
         }
 
-        const usuario = await UsuarioRepository.getById(id);
+        const usuario = await UsuarioRepositorySelected.getById(id);
         if (!usuario) {
             throw new Error('Usuario no encontrado');
         }
@@ -105,7 +107,7 @@ export const UsuarioService = {
             throw new Error('Mail y contraseña son obligatorios');
         }
 
-        const usuario = await UsuarioRepository.getByMail(mail);
+        const usuario = await UsuarioRepositorySelected.getByMail(mail);
         if (!usuario) {
             throw new Error('Credenciales inválidas');
         }
@@ -123,13 +125,13 @@ export const UsuarioService = {
             throw new Error('El ID del usuario es obligatorio');
         }
 
-        const usuario = await UsuarioRepository.getById(userId);
+        const usuario = await UsuarioRepositorySelected.getById(userId);
         if (!usuario) {
             throw new Error('Usuario no encontrado');
         }
 
         const nuevaEdad = usuario.edad + 1;
-        const usuarioActualizado = await UsuarioRepository.updateEdad(userId, nuevaEdad);
+        const usuarioActualizado = await UsuarioRepositorySelected.updateEdad(userId, nuevaEdad);
 
         return usuarioActualizado;
     }

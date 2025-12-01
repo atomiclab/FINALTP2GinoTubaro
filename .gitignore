@@ -145,3 +145,6 @@ vite.config.ts.timestamp-*
 /ORT-TP2-ProyectoFinal
 /proyecto-stock-api
 .DS_Store
+
+# Database JSON archivo
+database/database.json
